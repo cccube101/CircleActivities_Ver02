@@ -5,7 +5,7 @@ namespace CustomInspector.Demo
     public class CI_ExampleScene : MonoBehaviour
     {
         [URL("http://mbservices.de/")]
-        [Preview(Size.big)] public Sprite image;
+        [Preview(Size.small)] public Sprite image;
 
         [HorizontalLine("Some examples")]
 
