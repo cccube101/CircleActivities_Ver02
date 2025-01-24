@@ -18,8 +18,6 @@ namespace Helper
         private static (Rect[], GUIStyle) _logParam = GetLogParam();
 
         // ---------------------------- Property
-        public const float CONST_HEIGHT = 1080;
-        public const float CONST_WIDTH = 1920;
         public static (Rect[] pos, GUIStyle style) LogParam => _logParam;
 
 

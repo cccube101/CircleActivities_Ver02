@@ -15,7 +15,7 @@ public class YieldCtrl : MonoBehaviour, IMessenger, IAwaitStarter
     private const float _zero = 0.0f;
     private const float _one = 1.0f;
 
-    private CanvasGroup _group = null;
+    private Tasks.GroupItem _item;
 
 
     // ---------------------------- UnityMessage
@@ -23,7 +23,7 @@ public class YieldCtrl : MonoBehaviour, IMessenger, IAwaitStarter
     async UniTask IAwaitStarter.Start()
     {
         //  キャッシュ
-        _group = _groupObj.GetComponent<CanvasGroup>();
+        _item = new Tasks.GroupItem(_groupObj, _groupObj.GetComponent<CanvasGroup>());
 
         await Tasks.Canceled(StartEvent(destroyCancellationToken));
     }
@@ -57,9 +57,9 @@ public class YieldCtrl : MonoBehaviour, IMessenger, IAwaitStarter
     private async UniTask Fade(float endValue, CancellationToken ct)
     {
         //  フェード処理
-        await _group.DOFade(endValue, _duration)
+        await _item.Group.DOFade(endValue, _duration)
             .SetEase(Ease.Linear)
-            .SetLink(_groupObj)
+            .SetLink(_item.Obj)
             .ToUniTask(Tasks.TCB, ct);
     }
 

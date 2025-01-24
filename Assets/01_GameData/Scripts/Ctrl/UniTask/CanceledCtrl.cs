@@ -18,7 +18,7 @@ public class CanceledCtrl : MonoBehaviour, IMessenger, IAwaitStarter
     private const float _zero = 0.0f;
     private const float _one = 1.0f;
 
-    private CanvasGroup _group = null;
+    private Tasks.GroupItem _item;
 
 
     // ---------------------------- UnityMessage
@@ -28,7 +28,7 @@ public class CanceledCtrl : MonoBehaviour, IMessenger, IAwaitStarter
     /// <returns>スタート処理</returns>
     async UniTask IAwaitStarter.Start()
     {
-        _group = _groupObj.GetComponent<CanvasGroup>();
+        _item = new Tasks.GroupItem(_groupObj, _groupObj.GetComponent<CanvasGroup>());
 
         //  フェード
         //  呼び出し元となる始めの await には Canceled を使用
@@ -64,31 +64,29 @@ public class CanceledCtrl : MonoBehaviour, IMessenger, IAwaitStarter
     {
         //  フェード
         //  一度呼び出し元で Canceled されていれば以降の処理で Canceled する必要はない
-        await FadeGroup(_group, _zero, _duration, Ease.Linear, _groupObj, ct);
-        await FadeGroup(_group, _one, _duration, Ease.Linear, _groupObj, ct);
+        await FadeGroup(_item, _zero, _duration, Ease.Linear, ct);
+        await FadeGroup(_item, _one, _duration, Ease.Linear, ct);
     }
 
     /// <summary>
     /// グループフェード処理
     /// </summary>
-    /// <param name="group">キャンバスグループ</param>
+    /// <param name="item">グループアイテム</param>
     /// <param name="end">α目標値</param>
     /// <param name="duration">処理時間</param>
     /// <param name="ease">イース</param>
-    /// <param name="obj">オブジェクト</param>
     /// <param name="ct">キャンセルトークン</param>
     /// <returns>フェード処理タスク</returns>
     private async UniTask FadeGroup
-    (CanvasGroup group
+    (Tasks.GroupItem item
     , float end
     , float duration
     , Ease ease
-    , GameObject obj
     , CancellationToken ct)
     {
-        await group.DOFade(end, duration)
+        await item.Group.DOFade(end, duration)
              .SetEase(ease)
-             .SetLink(obj)
+             .SetLink(item.Obj)
              .ToUniTask(Tasks.TCB, ct);
     }
 
@@ -108,9 +106,9 @@ public class CanceledCtrl : MonoBehaviour, IMessenger, IAwaitStarter
         //  タスクを全て共通化するのは得策でもないことが多い
         async UniTask Fade(float endValue)
         {
-            await _group.DOFade(endValue, _duration)
+            await _item.Group.DOFade(endValue, _duration)
                 .SetEase(Ease.Linear)
-                .SetLink(_groupObj)
+                .SetLink(_item.Obj)
                 .ToUniTask(Tasks.TCB, ct);
         }
 

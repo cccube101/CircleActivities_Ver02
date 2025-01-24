@@ -1,6 +1,8 @@
 using Cysharp.Threading.Tasks;
 using System.Threading;
 using System;
+using UnityEngine;
+using UnityEngine.UI;
 
 namespace Helper
 {
@@ -9,18 +11,54 @@ namespace Helper
     /// </summary>
     public static class Tasks
     {
-        // ---------------------------- Field
+        /// <summary>
+        /// レクトトランスフォームアイテム
+        /// </summary>
+        public struct RectItem
+        {
+            public RectItem(GameObject obj, RectTransform rect)
+            {
+                Obj = obj;
+                Rect = rect;
+            }
+
+            public GameObject Obj;
+            public RectTransform Rect;
+        }
+
+        /// <summary>
+        /// キャンバスグループアイテム
+        /// </summary>
+        public struct GroupItem
+        {
+            public GroupItem(GameObject obj, CanvasGroup group)
+            {
+                Obj = obj;
+                Group = group;
+            }
+
+            public GameObject Obj;
+            public CanvasGroup Group;
+        }
+
+        /// <summary>
+        /// イメージアイテム
+        /// </summary>
+        public struct ImageItem
+        {
+            public ImageItem(GameObject obj, Image img)
+            {
+                Obj = obj;
+                Img = img;
+            }
+
+            public GameObject Obj;
+            public Image Img;
+        }
 
 
         // ---------------------------- Property
         public static TweenCancelBehaviour TCB => TweenCancelBehaviour.KillAndCancelAwait;
-
-
-
-        // ---------------------------- UnityMessage
-
-
-
 
         // ---------------------------- PublicMethod
         /// <summary>

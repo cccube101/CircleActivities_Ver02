@@ -1,4 +1,3 @@
-
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Helper;
@@ -12,18 +11,6 @@ using UnityEngine.UI;
 
 public class WhenAllCtrl : MonoBehaviour, IMessenger, IStarter, IUpdater
 {
-    private class GroupParam
-    {
-        public GroupParam(CanvasGroup group, GameObject obj)
-        {
-            Group = group;
-            Obj = obj;
-        }
-
-        public CanvasGroup Group;
-        public GameObject Obj;
-    }
-
     // ---------------------------- SerializeField
     [SerializeField] private Button _btn;
     [SerializeField] private TMP_Text _text;
@@ -36,7 +23,7 @@ public class WhenAllCtrl : MonoBehaviour, IMessenger, IStarter, IUpdater
     private const float _zero = 0.0f;
     private const float _one = 1.0f;
 
-    private List<GroupParam> _params = new();
+    private readonly List<Tasks.GroupItem> _items = new();
     private bool _canAddTime = false;
     private float _time = 0.0f;
 
@@ -48,7 +35,7 @@ public class WhenAllCtrl : MonoBehaviour, IMessenger, IStarter, IUpdater
     {
         foreach (var obj in _groupObjects)
         {
-            _params.Add(new GroupParam(obj.GetComponent<CanvasGroup>(), obj));
+            _items.Add(new Tasks.GroupItem(obj, obj.GetComponent<CanvasGroup>()));
         }
 
         //  ボタン監視
@@ -94,14 +81,14 @@ public class WhenAllCtrl : MonoBehaviour, IMessenger, IStarter, IUpdater
         var tasks = new List<UniTask>();
         //  タスク保存
         int i = 0;  //  差を出すために加算する変数を用意
-        foreach (var param in _params)
+        foreach (var item in _items)
         {
             tasks.Add(Fade());
             async UniTask Fade()
             {
-                await param.Group.DOFade(endValue, _duration + i * _addDuration)
+                await item.Group.DOFade(endValue, _duration + i * _addDuration)
                     .SetEase(Ease.Linear)
-                    .SetLink(param.Obj)
+                    .SetLink(item.Obj)
                     .ToUniTask(Tasks.TCB, ct);
             }
             i++;
