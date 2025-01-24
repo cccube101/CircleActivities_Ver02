@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7290417925792891397}
   - component: {fileID: 1319093521769267472}
   m_Layer: 5
-  m_Name: Yield
+  m_Name: YieldCtrl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

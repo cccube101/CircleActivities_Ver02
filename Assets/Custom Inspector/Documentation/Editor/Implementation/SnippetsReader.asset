@@ -1337,20 +1337,10 @@ MonoBehaviour:
       oddNumber: 1
     array2DExamples:
       images:
-        rowAmount: 4
-        columnAmount: 2
+        rowAmount: 1
+        columnAmount: 1
         rows:
         - elements:
-          - {fileID: 0}
-          - {fileID: 0}
-        - elements:
-          - {fileID: 0}
-          - {fileID: 0}
-        - elements:
-          - {fileID: 0}
-          - {fileID: 0}
-        - elements:
-          - {fileID: 0}
           - {fileID: 0}
       numbers:
         rowAmount: 1
@@ -1359,9 +1349,9 @@ MonoBehaviour:
         - elements: 00000000000000000000000000000000
     dynamicSliderExamples:
       sliderValue:
-        value: 15.2
-        min: -11
-        max: 91.2
+        value: -9
+        min: -9.03
+        max: 82.42
       value2:
         value: 5
         min: 1
