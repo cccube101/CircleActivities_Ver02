@@ -9,6 +9,7 @@
 
 02_Sample
 ・InputSystemのサンプル
+・UniTaskのサンプル (キャンセル処理のサンプルを追加)
 
 
 
