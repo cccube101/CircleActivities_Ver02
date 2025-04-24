@@ -1,4 +1,3 @@
-using Alchemy.Inspector;
 using System.ComponentModel.DataAnnotations;
 using UnityEngine;
 //  使っていない using はできるだけ削除しよう
@@ -114,9 +113,6 @@ public class CodingRule : MonoBehaviour
      * 頭に _ を付ける
      * 大文字で区切る
      */
-
-    //  Alchemy属性例
-    [SerializeField, Required, BoxGroup("基礎パラメータ")] private State _state;
 
     private float _score = 0;
     private GameObject _playerObj = null;
