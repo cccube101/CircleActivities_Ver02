@@ -23,7 +23,7 @@ public class YieldCtrl : MonoBehaviour, IMessenger, IAwaitStarter
     async UniTask IAwaitStarter.Start()
     {
         //  ƒLƒƒƒbƒVƒ…
-        _item = new Tasks.GroupItem(_groupObj, _groupObj.GetComponent<CanvasGroup>());
+        _item = new Tasks.GroupItem(_groupObj);
 
         await Tasks.Canceled(StartEvent(destroyCancellationToken));
     }

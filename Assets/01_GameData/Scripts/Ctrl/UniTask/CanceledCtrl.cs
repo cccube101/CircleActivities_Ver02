@@ -28,7 +28,7 @@ public class CanceledCtrl : MonoBehaviour, IMessenger, IAwaitStarter
     /// <returns>スタート処理</returns>
     async UniTask IAwaitStarter.Start()
     {
-        _item = new Tasks.GroupItem(_groupObj, _groupObj.GetComponent<CanvasGroup>());
+        _item = new Tasks.GroupItem(_groupObj);
 
         //  フェード
         //  呼び出し元となる始めの await には Canceled を使用
