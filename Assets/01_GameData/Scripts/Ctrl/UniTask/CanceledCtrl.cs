@@ -32,9 +32,23 @@ public class CanceledCtrl : MonoBehaviour, IMessenger, IAwaitStarter
 
         //  フェード
         //  呼び出し元となる始めの await には Canceled を使用
-        await Tasks.Canceled(StartEvent01(destroyCancellationToken));
+        try
+        {
+            await StartEvent01(destroyCancellationToken);
+        }
+        catch
+        {
+
+        }
         //  上と全く同じ処理
-        await Tasks.Canceled(StartEvent02(destroyCancellationToken));
+        try
+        {
+            await StartEvent02(destroyCancellationToken);
+        }
+        catch
+        {
+
+        }
 
         //  ボタン監視
         _btn.OnClickAsObservable().SubscribeAwait(async (_, ct) =>

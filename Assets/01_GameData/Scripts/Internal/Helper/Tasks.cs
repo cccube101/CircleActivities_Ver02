@@ -61,16 +61,15 @@ namespace Helper
         }
 
         /// <summary>
-        /// UniTaskキャンセル
+        /// キャンセル処理
         /// </summary>
-        /// <param name="task">キャンセルしたいタスク</param>
-        /// <returns>キャンセル処理</returns>
-        public static async UniTask Canceled(UniTask task)
+        /// <param name="cts">キャンセルトークンソース</param>
+        public static void Cancel(ref CancellationTokenSource cts)
         {
-            if (await task.SuppressCancellationThrow()) { return; }
+            if (cts.IsCancellationRequested) return;    //  キャンセル済み判定
+            cts.Cancel();
+            cts.Dispose();
         }
-
-
 
 
         // ---------------------------- PrivateMethod
