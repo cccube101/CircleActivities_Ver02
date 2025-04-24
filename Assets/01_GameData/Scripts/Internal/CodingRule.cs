@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using UnityEngine;
 //  g‚Á‚Ä‚¢‚È‚¢ using ‚Í‚Å‚«‚é‚¾‚¯íœ‚µ‚æ‚¤
 

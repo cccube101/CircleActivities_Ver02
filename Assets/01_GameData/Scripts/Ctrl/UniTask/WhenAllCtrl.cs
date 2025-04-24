@@ -35,7 +35,7 @@ public class WhenAllCtrl : MonoBehaviour, IMessenger, IStarter, IUpdater
     {
         foreach (var obj in _groupObjects)
         {
-            _items.Add(new Tasks.GroupItem(obj, obj.GetComponent<CanvasGroup>()));
+            _items.Add(new Tasks.GroupItem(obj));
         }
 
         //  ƒ{ƒ^ƒ“ŠÄŽ‹

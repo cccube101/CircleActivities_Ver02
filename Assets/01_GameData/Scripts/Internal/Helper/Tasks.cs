@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
-using System.Threading;
 using System;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,14 +16,10 @@ namespace Helper
         /// </summary>
         public struct RectItem
         {
-            public RectItem(GameObject obj, RectTransform rect)
-            {
-                Obj = obj;
-                Rect = rect;
-            }
+            public RectItem(GameObject obj) => Obj = obj;
 
             public GameObject Obj;
-            public RectTransform Rect;
+            public readonly RectTransform Rect => Obj.GetComponent<RectTransform>();
         }
 
         /// <summary>
@@ -31,14 +27,10 @@ namespace Helper
         /// </summary>
         public struct GroupItem
         {
-            public GroupItem(GameObject obj, CanvasGroup group)
-            {
-                Obj = obj;
-                Group = group;
-            }
+            public GroupItem(GameObject obj) => Obj = obj;
 
             public GameObject Obj;
-            public CanvasGroup Group;
+            public readonly CanvasGroup Group => Obj.GetComponent<CanvasGroup>();
         }
 
         /// <summary>
@@ -46,14 +38,10 @@ namespace Helper
         /// </summary>
         public struct ImageItem
         {
-            public ImageItem(GameObject obj, Image img)
-            {
-                Obj = obj;
-                Img = img;
-            }
+            public ImageItem(GameObject obj) => Obj = obj;
 
             public GameObject Obj;
-            public Image Img;
+            public readonly Image Img => Obj.GetComponent<Image>();
         }
 
 
@@ -73,16 +61,15 @@ namespace Helper
         }
 
         /// <summary>
-        /// UniTaskキャンセル
+        /// キャンセル処理
         /// </summary>
-        /// <param name="task">キャンセルしたいタスク</param>
-        /// <returns>キャンセル処理</returns>
-        public static async UniTask Canceled(UniTask task)
+        /// <param name="cts">キャンセルトークンソース</param>
+        public static void Cancel(ref CancellationTokenSource cts)
         {
-            if (await task.SuppressCancellationThrow()) { return; }
+            if (cts.IsCancellationRequested) return;    //  キャンセル済み判定
+            cts.Cancel();
+            cts.Dispose();
         }
-
-
 
 
         // ---------------------------- PrivateMethod
