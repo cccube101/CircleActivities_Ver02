@@ -66,11 +66,15 @@ namespace Helper
         /// <param name="cts">キャンセルトークンソース</param>
         public static void Cancel(ref CancellationTokenSource cts)
         {
-            if (cts.IsCancellationRequested) return;    //  キャンセル済み判定
+            if (cts.IsCancellationRequested)
+            {
+                Debug.Log("キャンセル済み");
+                return;
+            }
             cts.Cancel();
             cts.Dispose();
+            Debug.Log("キャンセル終了");
         }
-
 
         // ---------------------------- PrivateMethod
 

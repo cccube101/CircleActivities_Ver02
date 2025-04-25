@@ -31,24 +31,9 @@ public class CanceledCtrl : MonoBehaviour, IMessenger, IAwaitStarter
         _item = new Tasks.GroupItem(_groupObj);
 
         //  フェード
-        //  呼び出し元となる始めの await には Canceled を使用
-        try
-        {
-            await StartEvent01(destroyCancellationToken);
-        }
-        catch
-        {
-
-        }
+        await StartEvent01(destroyCancellationToken).SuppressCancellationThrow();
         //  上と全く同じ処理
-        try
-        {
-            await StartEvent02(destroyCancellationToken);
-        }
-        catch
-        {
-
-        }
+        await StartEvent02(destroyCancellationToken).SuppressCancellationThrow();
 
         //  ボタン監視
         _btn.OnClickAsObservable().SubscribeAwait(async (_, ct) =>
@@ -58,7 +43,7 @@ public class CanceledCtrl : MonoBehaviour, IMessenger, IAwaitStarter
             //}, AwaitOperation.Switch)
             //.RegisterTo(destroyCancellationToken);
             //
-            //  の部分が キャンセル の代わりに指定した挙動をしてくれるので Canceled の必要はない
+            //  の部分が キャンセル の代わりに指定した挙動をしてくれるので Suppress の必要はない
             await StartEvent02(ct);
 
         }, AwaitOperation.Switch)
@@ -77,7 +62,7 @@ public class CanceledCtrl : MonoBehaviour, IMessenger, IAwaitStarter
     private async UniTask StartEvent01(CancellationToken ct)
     {
         //  フェード
-        //  一度呼び出し元で Canceled されていれば以降の処理で Canceled する必要はない
+        //  一度呼び出し元で Suppress されていれば以降の処理で Suppress する必要はない
         await FadeGroup(_item, _zero, _duration, Ease.Linear, ct);
         await FadeGroup(_item, _one, _duration, Ease.Linear, ct);
     }
