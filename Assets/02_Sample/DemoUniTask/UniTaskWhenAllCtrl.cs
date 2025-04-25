@@ -22,12 +22,9 @@ public class UniTaskWhenAllCtrl : MonoBehaviour
     [SerializeField] GameObject _textObj02;
     [SerializeField] GameObject _textObj03;
     [SerializeField] private float _duration;
-    [SerializeField] private Button _cancelBtn;
     [SerializeField] private Button _retryBtn;
 
     // ---------------------------- Field
-    CancellationTokenSource _cts = new();
-    CancellationToken CT => _cts.Token;
     private TextItem Text01 => new(_textObj01);
     private TextItem Text02 => new(_textObj02);
     private TextItem Text03 => new(_textObj03);
@@ -37,30 +34,10 @@ public class UniTaskWhenAllCtrl : MonoBehaviour
     // ---------------------------- UnityMessage
     private async UniTaskVoid Start()
     {
-        // キャンセル
-        _cancelBtn.onClick.AddListener(() =>
-        {
-            Tasks.Cancel(ref _cts);
-        });
-
         // 同時処理タスク
-        try
-        {
-            await WhenAllTask(CT);
-        }
-        catch
-        {
-            Debug.Log("キャンセルされました");
-        }
-
-        Tasks.Cancel(ref _cts);
+        await WhenAllTask(destroyCancellationToken).SuppressCancellationThrow();
 
         ObserveBtn();   //  ボタン監視
-    }
-
-    private void OnDestroy()
-    {
-        Tasks.Cancel(ref _cts);
     }
 
     // ---------------------------- PrivateMethod
@@ -70,25 +47,23 @@ public class UniTaskWhenAllCtrl : MonoBehaviour
     private void ObserveBtn()
     {
         // R3を使用したボタン監視
-        _retryBtn.OnClickAsObservable().SubscribeAwait(async (_, ct) =>
-        {
-            await WhenAllTask(ct);
 
+        // 監視対象のボタン
+        _retryBtn
+            // クリックの監視
+            .OnClickAsObservable()
+            // クリックされた際に通知を出力
+            // _ の部分に受け取る値（今回は空なので _）
+            // ct の部分に下記で指定したキャンセルトークンを設定
+            .SubscribeAwait(async (_, ct) =>
+        {
+            await WhenAllTask(ct); // 任意の処理
+
+            // キャンセルされた際の実行挙動を指定
+            // Switchなら実行中のタスクをキャンセルして新しいタスクを優先する
         }, AwaitOperation.Switch)
+        // トークンを指定
         .RegisterTo(destroyCancellationToken);
-
-        var f = false; // 未使用の警告避け
-        if (f)
-        {
-            _retryBtn // 監視対象のボタン
-            .OnClickAsObservable() // ボタンのクリックを監視
-            .SubscribeAwait(async (_, ct) => // クリックの実行判定
-            {
-                await WhenAllTask(ct); // 任意のタスク
-
-            }, AwaitOperation.Switch) // キャンセル処理された際の実行・終了方法を指定
-            .RegisterTo(destroyCancellationToken); // キャンセルトークンの登録
-        }
     }
 
     /// <summary>

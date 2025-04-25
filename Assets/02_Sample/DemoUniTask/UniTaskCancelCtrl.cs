@@ -9,94 +9,76 @@ using UnityEngine.UI;
 
 public class UniTaskCancelCtrl : MonoBehaviour
 {
-    private enum CancelType
-    {
-        Normal,
-        InMethod,
-        Destroy,
-    }
     // ---------------------------- SerializeField
-    [SerializeField] GameObject _textObj;
+    [SerializeField] TMP_Text _text;
     [SerializeField] private float _duration;
     [SerializeField] private Button _startBtn;
     [SerializeField] private Button _cancelBtn;
 
-
     // ---------------------------- Field
     CancellationTokenSource _cts = new();
-    private TMP_Text Text => _textObj.GetComponent<TMP_Text>();
+    private GameObject Obj => gameObject;
     bool _canStart = false;
 
-    // ---------------------------- UnityMessage
-    // Awakeでも await したいものがあれば以下のようにUniTaskVoidを使う
-    //private async UniTaskVoid Awake()
-    //{
-    //    await UniTask.Yield(); // 任意のタスク
-    //}
 
+    // ---------------------------- UnityMessage
     private async UniTaskVoid Start()
     {
-        // ------ キャンセル処理方法の例 ------
-
-
-        //トークンの変数化
-        // 任意のタイミングでキャンセルするトークン
-        var ct = _cts.Token;
         // オブジェクトがデストロイされた際にキャンセルされるトークン
-        // 任意のタイミングでキャンセルしない場合有効
+
+        // このスクリプトがコンポーネントとして付けられたオブジェクトを監視
+        // デストロイの処理順が不透明になっているので複数のトークンを使用する際には注意
+        // 例：OnDestroyより早くキャンセルの処理が実行された
         var dct = destroyCancellationToken;
-        var objCt = _textObj.GetCancellationTokenOnDestroy();
+        var objCt = _text.GetCancellationTokenOnDestroy(); // 任意のオブジェクトを監視
 
         ObserveBtn();   //  ボタン監視
-
-
 
         await WaitStart(dct);   //  ボタンが押されるまで待機
 
 
 
         // 一般的な例外処理方法
-        // キャンセル処理を任意のタイミングで行う場合に使用
+        Debug.Log("開始：Normal");
         try
         {
-            await NormalCount(ct);
-            Debug.Log("一般的なタスクが終了しました");
+            await Count(_cts.Token);
+            Debug.Log("終了：Normal");
         }
-        catch
+        catch (OperationCanceledException)
         {
-            Debug.Log("一般的なタスクがキャンセルされました");
+            Debug.Log("キャンセル：Normal");
         }
 
 
 
-        await WaitStart(dct);   //  ボタンが押されるまで待機
+        await WaitStart(dct);
 
 
 
-        // 呼び出し先の関数内でキャンセルする場合
-        // 例外処理の呼び出し位置を調整することができる
-        await InMethodCount(ct);
-
-
-
-        await WaitStart(dct);   //  ボタンが押されるまで待機
-
-
-
-        //  try-catchを使わない方法
-        // 任意のタイミングでキャンセルしない場合有効
-        if (await DestroyCount(objCt).SuppressCancellationThrow())
+        // try-catchを使わない方法
+        // OperationCanceledException を bool型(UniTask<bool>)で返してくれます
+        Debug.Log("開始：Suppress");
+        if (await Count(_cts.Token).SuppressCancellationThrow())
         {
-            Debug.Log("デストロイ依存のタスクがキャンセルされました");
-            return;
+            Debug.Log("キャンセル：Suppress");
         }
-        // 同上
-        // await Tasks.Canceled(DestroyCount(objCt));
+        Debug.Log("終了：Suppress");
 
+
+
+        await WaitStart(dct);
+
+
+
+        Debug.Log("開始：Suppress");
+        await Count(_cts.Token).SuppressCancellationThrow();
+        Debug.Log("終了：Suppress");
     }
 
     private void OnDestroy()
     {
+        Debug.Log("デストロイ");
         Tasks.Cancel(ref _cts);
     }
 
@@ -132,13 +114,7 @@ public class UniTaskCancelCtrl : MonoBehaviour
     /// <returns>待機処理</returns>
     private async UniTask WaitStart(CancellationToken ct)
     {
-        try
-        {
-            await UniTask.WaitUntil(() => _canStart, cancellationToken: ct);
-        }
-        catch
-        {
-        }
+        await UniTask.WaitUntil(() => _canStart, cancellationToken: ct).SuppressCancellationThrow();
         _canStart = false;
     }
 
@@ -146,64 +122,17 @@ public class UniTaskCancelCtrl : MonoBehaviour
     /// カウント
     /// </summary>
     /// <param name="ct">キャンセルトークン</param>
-    /// <returns>カウント終了 または キャンセル</returns>
-    private async UniTask NormalCount(CancellationToken ct)
-    {
-        await Count(CancelType.Normal, ct);
-    }
-
-    /// <summary>
-    /// カウント
-    /// </summary>
-    /// <param name="ct">キャンセルトークン</param>
-    /// <returns>カウント終了 または キャンセル</returns>
-    private async UniTask InMethodCount(CancellationToken ct)
-    {
-        try
-        {
-            await Count(CancelType.InMethod, ct);
-            Debug.Log("関数内でキャンセルされるタスクが終了しました");
-        }
-        catch
-        {
-            Debug.Log("関数内でキャンセルされるタスクがキャンセルされました");
-        }
-    }
-
-    /// <summary>
-    /// カウント
-    /// </summary>
-    /// <param name="ct">キャンセルトークン</param>
-    /// <returns>カウント終了 または キャンセル</returns>
-    private async UniTask DestroyCount(CancellationToken ct)
-    {
-        await Count(CancelType.Destroy, ct);
-    }
-
-    /// <summary>
-    /// カウント
-    /// </summary>
-    /// <param name="ct">キャンセルトークン</param>
     /// <returns>カウント</returns>
-    private async UniTask Count(CancelType type, CancellationToken ct)
+    private async UniTask Count(CancellationToken ct)
     {
-        // 種類
-        var text = type switch
-        {
-            CancelType.Normal => "Normal",
-            CancelType.InMethod => "InMethod",
-            CancelType.Destroy => "Destroy",
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-        };
-
         // カウント
         await DOVirtual.Float(0, _duration, _duration,
             (value) =>
             {
-                Text.text = $"{text}:{value:0.0}";
+                _text.text = $"{value:0.0}";
             })
             .SetEase(Ease.Linear)
-            .SetLink(_textObj)
+            .SetLink(Obj)
             .ToUniTask(Tasks.TCB, ct);
     }
 }

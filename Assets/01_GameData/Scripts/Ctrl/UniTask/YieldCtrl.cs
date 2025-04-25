@@ -24,15 +24,7 @@ public class YieldCtrl : MonoBehaviour, IMessenger, IAwaitStarter
     {
         //  ƒLƒƒƒbƒVƒ…
         _item = new Tasks.GroupItem(_groupObj);
-
-        try
-        {
-            await StartEvent(destroyCancellationToken);
-        }
-        catch
-        {
-
-        }
+        await StartEvent(destroyCancellationToken).SuppressCancellationThrow();
     }
 
     // ---------------------------- PrivateMethod
