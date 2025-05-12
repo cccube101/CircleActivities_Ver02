@@ -1,7 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 public sealed class MenuItemScreenShot : Editor
 {
@@ -14,15 +12,15 @@ public sealed class MenuItemScreenShot : Editor
     [MenuItem(MENU_PATH, priority = 60)]
     static void CaptureScreenShot()
     {
-        var filename = System.DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".png";
+        var filename = $"ScreenShot/{System.DateTime.Now:yyyyMMdd-HHmmss}.png";
 
         ScreenCapture.CaptureScreenshot(filename);
 
         var assembly = typeof(EditorWindow).Assembly;
         var type = assembly.GetType("UnityEditor.GameView");
-        var gameview = EditorWindow.GetWindow(type);
-        gameview.Repaint();
+        var gameView = EditorWindow.GetWindow(type);
+        gameView.Repaint();
 
-        Debug.Log("ScreenShot captured to " + filename + ".");
+        Debug.Log($"ScreenShot captured to {filename}.");
     }
 }
